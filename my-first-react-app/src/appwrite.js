@@ -1,9 +1,12 @@
 import { Client, Databases, Query, ID } from 'appwrite';
 
+
 const PROJECT_ID = import.meta.env.VITE_APPWRITE_PROJECT_ID;
 const DATABASE_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 const COLLECTION_ID = import.meta.env.VITE_APPWRITE_COLLECTION_ID;
+const USER_COLLECTION_ID = import.meta.env.VITE_APPWRITE_USER_COLLECTION_ID;
 const APPWRITE_ENDPOINT = import.meta.env.VITE_APPWRITE_ENDPOINT;
+const SECRET = import.meta.env.VITE_SECRET; // Use a secure secret key in production
 
 export const updateSearchCount = async ({searchTerm, movie}) => {
     if (!searchTerm) {
@@ -60,3 +63,22 @@ export const getTrendingMovies = async () => {
         return [];
     }
 }
+
+export const registerUser = async (username, password, name) => {
+    const res = await fetch('http://localhost:5000/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, name })
+    });
+    return res.json();
+}
+
+export const loginUser = async (username, password) => {
+    const res = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    });
+    return res.json();
+}
+
