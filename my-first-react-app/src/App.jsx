@@ -4,17 +4,10 @@ import { useDebounce } from 'react-use';
 import Spinner from './components/Spinner';
 import MovieCard from './components/MovieCard';
 import { updateSearchCount, getTrendingMovies } from './appwrite.js';
+import NavBar from './components/NavBar';
+// Allow cross-origin requests
 
-const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const API_BASE_URL = 'https://api.themoviedb.org/3';
-
-const API_OPTIONS = {
-  method: 'GET',
-  headers: {
-    accept: 'application/json',
-    Authorization: `Bearer ${API_KEY}`,
-  },
-};
 
 
 function App() {
@@ -32,27 +25,38 @@ function App() {
   const fetchMovies = async (query="") => {
     try {
       const endpoint = query == ""?
-
       `${API_BASE_URL}/discover/movie?sort_by=popularity.desc` :
-      `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`; 
+      `${API_BASE_URL}/search/movie?query=${encodeURIComponent(query)}`;
 
-
-      const response = await fetch(endpoint, API_OPTIONS);
+      // Fetch movies from the backend by sending the endpoint to the server
+      setLoading(true);
+      // Use the backend endpoint to fetch movies
+      const response = await fetch(`http://localhost:5000/movies?endpoint=${encodeURIComponent(endpoint)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      const data = await response.json();
 
+      const data = await response.json();
+      const movies = data.results || [];
 
       // Show the movie titles here as a list
-      setMovies(data.results || []);
+      setMovies(movies);
       setLoading(false);
 
-      updateSearchCount({searchTerm: query, movie: data.results[0]});
-      
+      // Only update search count if we have movies and a search term
+      if (query && movies.length > 0) {
+        updateSearchCount({searchTerm: query, movie: movies[0]});
+      }
+
     } catch (error) {
       console.error('Fetch error:', error);
+      setMovies([]);
     } finally {
       setLoading(false);
     }
@@ -79,6 +83,8 @@ function App() {
 
   return (
     <main>
+
+      <NavBar />
       <div className="pattern" />
 
       <div className="wrapper">

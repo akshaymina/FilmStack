@@ -8,6 +8,7 @@ const USER_COLLECTION_ID = import.meta.env.VITE_APPWRITE_USER_COLLECTION_ID;
 const APPWRITE_ENDPOINT = import.meta.env.VITE_APPWRITE_ENDPOINT;
 const SECRET = import.meta.env.VITE_SECRET; // Use a secure secret key in production
 
+
 export const updateSearchCount = async ({searchTerm, movie}) => {
     if (!searchTerm) {
         console.warn("Search term is empty, not updating search count.");
